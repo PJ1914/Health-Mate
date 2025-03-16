@@ -1,0 +1,135 @@
+.container {
+  padding: 2rem;
+  min-height: calc(100vh - 64px);
+  background: linear-gradient(135deg, var(--background-light), var(--background-dark));
+}
+
+.cameraSection {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.webcamContainer {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  background-color: #000;
+}
+
+.webcam {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.resultsSection {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  padding: 1.5rem;
+  height: 100%;
+  animation: slideIn 0.5s ease-out;
+}
+
+.resultItem {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: var(--background-light);
+  margin-bottom: 1rem;
+  transition: transform var(--transition-speed);
+}
+
+.resultItem:hover {
+  transform: translateX(5px);
+}
+
+.confidenceBadge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+  color: white;
+  font-size: 0.875rem;
+  margin-left: auto;
+}
+
+.loadingOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+
+@media (max-width: 960px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .webcamContainer {
+    height: 300px;
+  }
+}
+
+@media (max-width: 600px) {
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .resultItem {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  .confidenceBadge {
+    margin-left: 0;
+  }
+} 

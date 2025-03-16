@@ -1,0 +1,91 @@
+.trackingContainer {
+  min-height: calc(100vh - 64px);
+  background: linear-gradient(135deg, var(--background-light) 0%, var(--background-dark) 100%);
+  padding: 2rem 0;
+}
+
+.title {
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: 2rem;
+  font-weight: 600;
+}
+
+.summaryCard {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--shadow-md) !important;
+  transition: transform 0.2s ease-in-out;
+}
+
+.summaryCard:hover {
+  transform: translateY(-4px);
+}
+
+.statsCard {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--shadow-md) !important;
+  height: 100%;
+  transition: transform 0.2s ease-in-out;
+}
+
+.statsCard:hover {
+  transform: translateY(-4px);
+}
+
+.foodLog {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--shadow-md) !important;
+  margin-top: 2rem;
+}
+
+.foodEntry {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  transition: background-color 0.2s ease;
+}
+
+.foodEntry:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.foodEntry:last-child {
+  border-bottom: none;
+}
+
+.progressBar {
+  height: 8px !important;
+  border-radius: 4px !important;
+}
+
+.progressBar:global(.MuiLinearProgress-colorPrimary) {
+  background-color: rgba(76, 175, 80, 0.2);
+}
+
+.progressBar:global(.MuiLinearProgress-barColorPrimary) {
+  background-color: var(--primary-color);
+}
+
+.macroDistribution {
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media (max-width: 600px) {
+  .trackingContainer {
+    padding: 1rem;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .summaryCard,
+  .statsCard,
+  .foodLog {
+    padding: 1rem !important;
+  }
+} 

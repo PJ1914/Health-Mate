@@ -1,0 +1,16 @@
+food_name,category,calories,protein,carbs,fat,image_url,food_class
+Grilled Chicken Breast,Protein,165,31,0,3.6,https://source.unsplash.com/featured/?grilled,chicken,chicken_breast
+Brown Rice,Carbs,216,5,45,1.8,https://source.unsplash.com/featured/?brown,rice,brown_rice
+Broccoli,Vegetables,55,3.7,11.2,0.6,https://source.unsplash.com/featured/?broccoli,broccoli
+Banana,Fruits,105,1.3,27,0.3,https://source.unsplash.com/featured/?banana,banana
+Greek Yogurt,Dairy,130,12,9,4,https://source.unsplash.com/featured/?yogurt,yogurt
+Salmon Fillet,Protein,208,22,0,13,https://source.unsplash.com/featured/?salmon,salmon
+Sweet Potato,Carbs,103,2,24,0.2,https://source.unsplash.com/featured/?sweet,potato,sweet_potato
+Spinach,Vegetables,23,2.9,3.6,0.4,https://source.unsplash.com/featured/?spinach,spinach
+Apple,Fruits,95,0.5,25,0.3,https://source.unsplash.com/featured/?apple,apple
+Egg,Protein,70,6,0.6,5,https://source.unsplash.com/featured/?egg,egg
+Oatmeal,Carbs,150,6,27,3,https://source.unsplash.com/featured/?oatmeal,oatmeal
+Carrots,Vegetables,41,0.9,10,0.2,https://source.unsplash.com/featured/?carrots,carrots
+Orange,Fruits,62,1.2,15.4,0.2,https://source.unsplash.com/featured/?orange,orange
+Milk,Dairy,103,8,12,2.4,https://source.unsplash.com/featured/?milk,milk
+Tuna,Protein,179,39,0,1,https://source.unsplash.com/featured/?tuna,tuna 
