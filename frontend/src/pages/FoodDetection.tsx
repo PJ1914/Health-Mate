@@ -33,18 +33,29 @@ const FoodDetection = () => {
       if (imageSrc) {
         setIsLoading(true);
         try {
+          // Convert base64 to blob
+          const base64Data = imageSrc.split(',')[1];
+          const blob = await fetch(`data:image/jpeg;base64,${base64Data}`).then(res => res.blob());
+          
+          // Create form data
+          const formData = new FormData();
+          formData.append('image', blob, 'capture.jpg');
+
           const response = await fetch('http://localhost:8000/api/detect-food/', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ image: imageSrc }),
+            body: formData,
           });
 
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
           const data = await response.json();
-          setDetectionResults(data.results);
+          console.log('Detection results:', data); // Debug log
+          setDetectionResults(data.detected_foods || []);
         } catch (error) {
           console.error('Error detecting food:', error);
+          setDetectionResults([]);
         } finally {
           setIsLoading(false);
         }
@@ -108,9 +119,7 @@ const FoodDetection = () => {
                       <ListItem>
                         <ListItemText
                           primary={result.food_name}
-                          secondary={`Calories: ${result.calories} kcal | Confidence: ${(
-                            result.confidence * 100
-                          ).toFixed(1)}%`}
+                          secondary={`Calories: ${result.calories} kcal`}
                         />
                       </ListItem>
                       {index < detectionResults.length - 1 && <Divider />}
