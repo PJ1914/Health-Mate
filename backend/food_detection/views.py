@@ -8,7 +8,11 @@ from rest_framework.decorators import action, api_view, parser_classes
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
 from django.shortcuts import get_object_or_404
-from .models import DetectionHistory, Food
+from django.conf import settings
+from .models import (
+    Food, DetectionHistory,
+    FirestoreFood, FirestoreDetectionHistory
+)
 from .serializers import (
     DetectionHistorySerializer,
     FoodDetectionRequestSerializer,
@@ -21,16 +25,21 @@ logger = logging.getLogger(__name__)
 
 class FoodDetectionViewSet(viewsets.ModelViewSet):
     serializer_class = DetectionHistorySerializer
-    queryset = DetectionHistory.objects.all()
+
+    async def get_queryset(self):
+        if settings.db is not None:
+            return await FirestoreDetectionHistory.get_all()
+        return DetectionHistory.objects.all()
 
     @action(detail=False, methods=['post'])
-    def detect_food(self, request):
+    async def detect_food(self, request):
         serializer = FoodDetectionRequestSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             # For demo purposes, return dummy results
+            # In production, this would use a trained model
             dummy_results = [
                 {"food_name": "Apple", "calories": 95, "confidence": 0.85},
                 {"food_name": "Banana", "calories": 105, "confidence": 0.75}
@@ -46,22 +55,26 @@ class FoodDetectionViewSet(viewsets.ModelViewSet):
 
 class FoodViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = FoodSerializer
-    queryset = Food.objects.all()
 
-    def get_queryset(self):
-        queryset = Food.objects.all()
+    async def get_queryset(self):
         category = self.request.query_params.get('category', None)
         search = self.request.query_params.get('search', None)
 
-        if category and category != 'all':
-            queryset = queryset.filter(category=category)
-        if search:
-            queryset = queryset.filter(name__icontains=search)
-        return queryset
+        if settings.db is not None:
+            if category and category != 'all':
+                return await FirestoreFood.get_by_category(category)
+            return await FirestoreFood.get_all()
+        else:
+            queryset = Food.objects.all()
+            if category and category != 'all':
+                queryset = queryset.filter(category=category)
+            if search:
+                queryset = queryset.filter(name__icontains=search)
+            return queryset
 
 @api_view(['POST'])
 @parser_classes([MultiPartParser])
-def detect_food(request):
+async def detect_food(request):
     logger.info("Received food detection request")
     
     if 'image' not in request.FILES:
@@ -84,16 +97,46 @@ def detect_food(request):
             
         logger.info(f"Successfully decoded image with shape: {image.shape}")
 
-        # For now, return dummy detection results
-        # In a real implementation, this would use a trained model
-        dummy_results = [
-            {"name": "Chicken Breast", "calories": 165},
-            {"name": "Broccoli", "calories": 55}
+        # In production, this would use a trained model to detect food
+        # For now, we'll return some sample foods from the database
+        if settings.db is not None:
+            detected_foods = await FirestoreFood.get_all()
+        else:
+            detected_foods = Food.objects.all()
+        
+        detected_foods = detected_foods[:2]  # Get first two foods as example
+        
+        results = [
+            {
+                "name": food.name,
+                "calories": food.calories,
+                "protein": food.protein,
+                "carbs": food.carbs,
+                "fat": food.fat,
+                "image_url": food.image_url
+            }
+            for food in detected_foods
         ]
 
-        logger.info(f"Returning detection results: {dummy_results}")
+        # Save detection history
+        for food in detected_foods:
+            if settings.db is not None:
+                detection = FirestoreDetectionHistory(
+                    food_id=food.id,
+                    image_url=request.build_absolute_uri(image_file.url) if hasattr(image_file, 'url') else '',
+                    confidence=0.85  # This would come from the ML model in production
+                )
+                await detection.save()
+            else:
+                DetectionHistory.objects.create(
+                    food=food,
+                    image_url=request.build_absolute_uri(image_file.url) if hasattr(image_file, 'url') else '',
+                    confidence=0.85  # This would come from the ML model in production
+                )
+
+        logger.info(f"Returning detection results: {results}")
         return Response({
-            'detected_foods': dummy_results,
+            'detected_foods': results,
             'message': 'Food detected successfully'
         })
 
