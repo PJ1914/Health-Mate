@@ -3,13 +3,36 @@
 from django.db import migrations, models
 import django.db.models.deletion
 
+def add_initial_data(apps, schema_editor):
+    Food = apps.get_model('food_detection', 'Food')
+    foods = [
+        {
+            'name': 'Apple',
+            'category': 'Fruit',
+            'calories': 95,
+            'protein': 0.5,
+            'carbs': 25,
+            'fat': 0.3,
+            'food_class': 'apple'
+        },
+        {
+            'name': 'Banana',
+            'category': 'Fruit',
+            'calories': 105,
+            'protein': 1.3,
+            'carbs': 27,
+            'fat': 0.3,
+            'food_class': 'banana'
+        }
+    ]
+    for food_data in foods:
+        Food.objects.create(**food_data)
 
 class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []  # Empty dependencies since this is the first migration
 
     operations = [
         migrations.CreateModel(
@@ -17,15 +40,12 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=100)),
-                ('category', models.CharField(choices=[('Protein', 'Protein'), ('Carbs', 'Carbs'), ('Vegetables', 'Vegetables'), ('Fruits', 'Fruits'), ('Dairy', 'Dairy')], max_length=20)),
-                ('calories', models.FloatField()),
+                ('category', models.CharField(max_length=50)),
+                ('calories', models.IntegerField()),
                 ('protein', models.FloatField()),
                 ('carbs', models.FloatField()),
                 ('fat', models.FloatField()),
-                ('image_url', models.URLField()),
-                ('food_class', models.CharField(max_length=50, unique=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('food_class', models.CharField(max_length=100)),
             ],
             options={
                 'ordering': ['name'],
@@ -35,10 +55,13 @@ class Migration(migrations.Migration):
             name='DetectionHistory',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('image', models.ImageField(upload_to='detections/')),
                 ('confidence', models.FloatField()),
                 ('detected_at', models.DateTimeField(auto_now_add=True)),
                 ('food', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='food_detection.food')),
             ],
+            options={
+                'ordering': ['-detected_at'],
+            },
         ),
+        migrations.RunPython(add_initial_data),
     ]

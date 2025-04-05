@@ -13,7 +13,7 @@ const Home = () => {
           <Typography variant="h2" component="h1" gutterBottom className={styles.title}>
             Welcome to Health Mate
           </Typography>
-          <Typography variant="h5" color="text.secondary" paragraph className={styles.subtitle}>
+          <Typography variant="h5" color="text.secondary" paragraph className={styles.subtitle} sx={{ margin: '0 auto' }}>
             Your personal assistant for real-time food calorie detection and nutrition tracking
           </Typography>
         </Box>

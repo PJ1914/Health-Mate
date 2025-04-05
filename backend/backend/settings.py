@@ -28,7 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'food_detection',
+    'food_detection.apps.FoodDetectionConfig',
 ]
 
 MIDDLEWARE = [
