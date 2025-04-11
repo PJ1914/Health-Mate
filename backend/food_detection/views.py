@@ -34,6 +34,17 @@ FOOD_CLASSES = [
     'rice', 'noodles', 'salad', 'bread', 'cake', 'donut', 'coffee', 'juice'
 ]
 
+# Define non-food classes that might be detected
+NON_FOOD_CLASSES = [
+    'person', 'human', 'face', 'dog', 'cat', 'bird', 'car', 'truck', 'bus',
+    'chair', 'table', 'laptop', 'computer', 'phone', 'book', 'pen', 'pencil',
+    'desk', 'bed', 'sofa', 'couch', 'television', 'tv', 'monitor', 'keyboard',
+    'mouse', 'door', 'window', 'wall', 'floor', 'ceiling', 'light', 'lamp',
+    'clock', 'watch', 'shoe', 'boot', 'sock', 'shirt', 'pants', 'dress', 'hat',
+    'glasses', 'sunglasses', 'bag', 'backpack', 'purse', 'wallet', 'key', 'lock',
+    'bottle', 'cup', 'glass', 'bowl', 'plate', 'fork', 'spoon', 'knife'
+]
+
 # Load the pre-trained model
 try:
     model = tf.keras.applications.MobileNetV2(
@@ -56,6 +67,65 @@ def preprocess_image(image):
     image = np.expand_dims(image, axis=0)
     return image
 
+def detect_food_in_image(image):
+    if model is None:
+        raise ValueError("Model not loaded")
+    
+    # Preprocess the image
+    processed_image = preprocess_image(image)
+    
+    # Get predictions
+    predictions = model.predict(processed_image)
+    
+    # Get top 5 predictions
+    top_indices = np.argsort(predictions[0])[-5:][::-1]
+    top_probs = predictions[0][top_indices]
+    
+    # Check if any of the top predictions are non-food items
+    non_food_detected = False
+    for idx in top_indices:
+        # Get the class name from ImageNet
+        class_name = tf.keras.applications.mobilenet_v2.decode_predictions(predictions, top=5)[0][0][1]
+        if class_name.lower() in NON_FOOD_CLASSES:
+            non_food_detected = True
+            break
+    
+    if non_food_detected:
+        return {"error": "Cannot detect - non-food item in frame", "is_food": False}
+    
+    # Convert to food items
+    detected_foods = []
+    for idx, prob in zip(top_indices, top_probs):
+        # Only process if confidence is above threshold
+        if float(prob) < 0.3:  # Confidence threshold
+            continue
+            
+        food_name = FOOD_CLASSES[idx % len(FOOD_CLASSES)]
+        try:
+            food = Food.objects.get(name__iexact=food_name)
+            detected_foods.append({
+                "name": food.name,
+                "calories": food.calories,
+                "protein": food.protein,
+                "carbs": food.carbs,
+                "fat": food.fat,
+                "confidence": float(prob)
+            })
+            
+            # Create detection history
+            DetectionHistory.objects.create(
+                food=food,
+                confidence=float(prob)
+            )
+        except Food.DoesNotExist:
+            logger.warning(f"Food item {food_name} not found in database")
+            continue
+    
+    if not detected_foods:
+        return {"error": "Cannot detect - no food items found", "is_food": False}
+    
+    return {"results": detected_foods, "is_food": True}
+
 class FoodDetectionViewSet(viewsets.ModelViewSet):
     serializer_class = DetectionHistorySerializer
     queryset = DetectionHistory.objects.all()
@@ -72,16 +142,42 @@ class FoodDetectionViewSet(viewsets.ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # For demo purposes, return dummy results
-            # In production, this would use a trained model
-            dummy_results = [
-                {"food_name": "Apple", "calories": 95, "confidence": 0.85},
-                {"food_name": "Banana", "calories": 105, "confidence": 0.75}
-            ]
+            # Get image from request
+            image_data = serializer.validated_data.get('image')
+            if not image_data:
+                return Response(
+                    {"error": "No image provided"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-            return Response({"results": dummy_results}, status=status.HTTP_200_OK)
+            # Convert base64 to image
+            try:
+                image_bytes = base64.b64decode(image_data)
+                image = Image.open(io.BytesIO(image_bytes))
+                image = np.array(image)
+            except Exception as e:
+                logger.error(f"Error decoding image: {str(e)}")
+                return Response(
+                    {"error": "Invalid image format"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Detect food in image
+            result = detect_food_in_image(image)
+            
+            if not result.get("is_food", False):
+                return Response(
+                    {"error": result.get("error", "Cannot detect food")},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            return Response({
+                "results": result["results"],
+                "message": "Food detected successfully"
+            }, status=status.HTTP_200_OK)
 
         except Exception as e:
+            logger.error(f"Error in food detection: {str(e)}", exc_info=True)
             return Response(
                 {"error": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -123,31 +219,17 @@ def detect_food(request):
         if image is None:
             return Response({'error': 'Invalid image format'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # For testing, return all foods from database
-        foods = Food.objects.all()
-        if not foods.exists():
-            return Response({'error': 'No food items in database'}, status=status.HTTP_404_NOT_FOUND)
-
-        detected_foods = []
-        for food in foods:
-            detected_food = {
-                "name": food.name,
-                "calories": food.calories,
-                "protein": food.protein,
-                "carbs": food.carbs,
-                "fat": food.fat,
-                "confidence": 0.95  # Example confidence score
-            }
-            detected_foods.append(detected_food)
-
-            # Create detection history
-            DetectionHistory.objects.create(
-                food=food,
-                confidence=0.95
+        # Detect food in image
+        result = detect_food_in_image(image)
+        
+        if not result.get("is_food", False):
+            return Response(
+                {'error': result.get("error", "Cannot detect food")},
+                status=status.HTTP_404_NOT_FOUND
             )
 
         return Response({
-            'detected_foods': detected_foods,
+            'detected_foods': result["results"],
             'message': 'Food detected successfully'
         })
 
