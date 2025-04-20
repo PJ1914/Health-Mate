@@ -81,7 +81,7 @@ const NutritionTracking = () => {
   const totals = calculateTotalNutrients();
 
   const handleDeleteEntry = async (id: string) => {
-    const success = await deleteFoodEntry(Number(id));
+    const success = await deleteFoodEntry((id));
     if (success) {
       setFoodEntries(entries => entries.filter(entry => entry.id !== id));
     }
