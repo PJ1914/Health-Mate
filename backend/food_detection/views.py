@@ -238,4 +238,4 @@ def detect_food(request):
         return Response(
             {'error': f'Error processing image: {str(e)}'},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        ) 
+        )

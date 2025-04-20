@@ -34,7 +34,7 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 media/
-
+firebase_credentials.json
 # Node
 node_modules/
 npm-debug.log*

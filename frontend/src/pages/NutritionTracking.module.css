@@ -11,39 +11,31 @@
   font-weight: 600;
 }
 
-.summaryCard {
+.summaryCard,
+.statsCard,
+.foodLog {
   background: rgba(255, 255, 255, 0.95) !important;
   border-radius: 16px !important;
   box-shadow: var(--shadow-md) !important;
   transition: transform 0.2s ease-in-out;
 }
 
-.summaryCard:hover {
-  transform: translateY(-4px);
-}
-
-.statsCard {
-  background: rgba(255, 255, 255, 0.95) !important;
-  border-radius: 16px !important;
-  box-shadow: var(--shadow-md) !important;
-  height: 100%;
-  transition: transform 0.2s ease-in-out;
-}
-
+.summaryCard:hover,
 .statsCard:hover {
   transform: translateY(-4px);
 }
 
 .foodLog {
-  background: rgba(255, 255, 255, 0.95) !important;
-  border-radius: 16px !important;
-  box-shadow: var(--shadow-md) !important;
   margin-top: 2rem;
 }
 
 .foodEntry {
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   transition: background-color 0.2s ease;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .foodEntry:hover {
@@ -67,6 +59,22 @@
   background-color: var(--primary-color);
 }
 
+.progressBarCalories {
+  background-color: rgba(255, 87, 34, 0.2); /* Orange for Calories */
+}
+
+.progressBarProtein {
+  background-color: rgba(33, 150, 243, 0.2); /* Blue for Protein */
+}
+
+.progressBarCarbs {
+  background-color: rgba(255, 235, 59, 0.2); /* Yellow for Carbs */
+}
+
+.progressBarFat {
+  background-color: rgba(233, 30, 99, 0.2); /* Pink for Fat */
+}
+
 .macroDistribution {
   height: 200px;
   display: flex;
@@ -88,4 +96,14 @@
   .foodLog {
     padding: 1rem !important;
   }
-} 
+
+  .foodEntry {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .foodEntry:hover {
+    background-color: rgba(0, 0, 0, 0.05); /* Slightly more prominent hover on mobile */
+  }
+}
