@@ -9,7 +9,7 @@ import {
   CardContent,
   CardMedia,
   InputAdornment,
-  IconButton,
+  //IconButton,
   Chip,
   Box,
   FormControl,
@@ -18,7 +18,7 @@ import {
   MenuItem,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import FilterListIcon from '@mui/icons-material/FilterList';
+// import FilterListIcon from '@mui/icons-material/FilterList';
 import styles from './FoodDatabase.module.css';
 
 interface FoodItem {
