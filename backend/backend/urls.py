@@ -7,4 +7,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('food_detection.urls')),
     path('api/nutrition/', include('nutrition.urls')),
+    path('api/fooddb/', include('fooddb.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 

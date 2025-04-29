@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Container,
   Typography,
@@ -9,17 +9,18 @@ import {
   CardContent,
   CardMedia,
   InputAdornment,
-  //IconButton,
   Chip,
   Box,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
+  Button,
+  Alert,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-// import FilterListIcon from '@mui/icons-material/FilterList';
 import styles from './FoodDatabase.module.css';
+import axios from 'axios';
 
 interface FoodItem {
   id: string;
@@ -32,101 +33,56 @@ interface FoodItem {
   image: string;
 }
 
+const API_URL = 'http://localhost:8000/api/fooddb/';
+const NUTRITION_API_URL = 'http://localhost:8000/api/nutrition/food/';
+
 const FoodDatabase = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-
-  // Sample food data
-  const foodItems: FoodItem[] = [
-    {
-      id: '1',
-      name: 'Grilled Chicken Breast',
-      calories: 165,
-      protein: 31,
-      carbs: 0,
-      fat: 3.6,
-      category: 'Protein',
-      image: 'https://source.unsplash.com/featured/?grilled,chicken',
-    },
-    {
-      id: '2',
-      name: 'Brown Rice',
-      calories: 216,
-      protein: 5,
-      carbs: 45,
-      fat: 1.8,
-      category: 'Carbs',
-      image: 'https://source.unsplash.com/featured/?brown,rice',
-    },
-    {
-      id: '3',
-      name: 'Broccoli',
-      calories: 55,
-      protein: 3.7,
-      carbs: 11.2,
-      fat: 0.6,
-      category: 'Vegetables',
-      image: 'https://source.unsplash.com/featured/?broccoli',
-    },
-    {
-      id: '4',
-      name: 'Banana',
-      calories: 105,
-      protein: 1.3,
-      carbs: 27,
-      fat: 0.3,
-      category: 'Fruits',
-      image: 'https://source.unsplash.com/featured/?banana',
-    },
-    {
-      id: '5',
-      name: 'Greek Yogurt',
-      calories: 130,
-      protein: 12,
-      carbs: 9,
-      fat: 4,
-      category: 'Dairy',
-      image: 'https://source.unsplash.com/featured/?yogurt',
-    },
-    {
-      id: '6',
-      name: 'Salmon Fillet',
-      calories: 208,
-      protein: 22,
-      carbs: 0,
-      fat: 13,
-      category: 'Protein',
-      image: 'https://source.unsplash.com/featured/?salmon',
-    },
-    {
-      id: '7',
-      name: 'Sweet Potato',
-      calories: 103,
-      protein: 2,
-      carbs: 24,
-      fat: 0.2,
-      category: 'Carbs',
-      image: 'https://source.unsplash.com/featured/?sweet,potato',
-    },
-    {
-      id: '8',
-      name: 'Spinach',
-      calories: 23,
-      protein: 2.9,
-      carbs: 3.6,
-      fat: 0.4,
-      category: 'Vegetables',
-      image: 'https://source.unsplash.com/featured/?spinach',
-    }
-  ];
+  const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const categories = ['all', 'Protein', 'Carbs', 'Vegetables', 'Fruits', 'Dairy'];
 
-  const filteredFoodItems = foodItems.filter((item) => {
-    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  useEffect(() => {
+    const fetchFoodItems = async () => {
+      if (!searchTerm) {
+        setFoodItems([]);
+        setLoading(false);
+        return;
+      }
+      try {
+        setLoading(true);
+        const params = { search: searchTerm, category: selectedCategory };
+        const response = await axios.get(API_URL, { params });
+        setFoodItems(response.data);
+      } catch (err) {
+        setError('Failed to load food items. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFoodItems();
+  }, [searchTerm, selectedCategory]);
+
+  const handleAddToLog = async (item: FoodItem) => {
+    try {
+      const entry = {
+        food_name: item.name,
+        calories: item.calories,
+        protein: item.protein,
+        carbs: item.carbs,
+        fat: item.fat,
+        userId: 'guest', // Placeholder for unauthenticated users
+        timestamp: new Date().toISOString(),
+      };
+      await axios.post(NUTRITION_API_URL, entry);
+      alert(`${item.name} added to log`);
+    } catch (err) {
+      setError('Failed to add food to log.');
+    }
+  };
 
   return (
     <div className={styles.databaseContainer}>
@@ -134,6 +90,18 @@ const FoodDatabase = () => {
         <Typography variant="h4" component="h1" gutterBottom className={styles.title}>
           Food Database
         </Typography>
+
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+
+        {loading && (
+          <Typography variant="body1" align="center" sx={{ my: 2 }}>
+            Loading...
+          </Typography>
+        )}
 
         <Paper className={styles.searchSection}>
           <Grid container spacing={3} alignItems="center">
@@ -173,47 +141,63 @@ const FoodDatabase = () => {
         </Paper>
 
         <Grid container spacing={3} className={styles.foodGrid}>
-          {filteredFoodItems.map((item) => (
-            <Grid item xs={12} sm={6} md={4} key={item.id}>
-              <Card className={styles.foodCard}>
-                <CardMedia
-                  component="img"
-                  height="140"
-                  image={item.image}
-                  alt={item.name}
-                  className={styles.foodImage}
-                />
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    {item.name}
-                  </Typography>
-                  <Box className={styles.nutritionInfo}>
-                    <Chip
-                      label={`${item.calories} cal`}
-                      color="primary"
-                      variant="outlined"
-                      size="small"
-                    />
-                    <Box className={styles.macros}>
-                      <Typography variant="body2" color="text.secondary">
-                        P: {item.protein}g
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        C: {item.carbs}g
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        F: {item.fat}g
-                      </Typography>
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
+          {foodItems.length === 0 && !loading && searchTerm ? (
+            <Grid item xs={12}>
+              <Typography variant="body1" color="text.secondary" align="center">
+                No foods found. Try another search term.
+              </Typography>
             </Grid>
-          ))}
+          ) : (
+            foodItems.map((item) => (
+              <Grid item xs={12} sm={6} md={4} key={item.id}>
+                <Card className={styles.foodCard}>
+                  <CardMedia
+                    component="img"
+                    height="140"
+                    image={item.image}
+                    alt={item.name}
+                    className={styles.foodImage}
+                  />
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      {item.name}
+                    </Typography>
+                    <Box className={styles.nutritionInfo}>
+                      <Chip
+                        label={`${item.calories.toFixed(0)} cal`}
+                        color="primary"
+                        variant="outlined"
+                        size="small"
+                      />
+                      <Box className={styles.macros}>
+                        <Typography variant="body2" color="text.secondary">
+                          P: {item.protein.toFixed(1)}g
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          C: {item.carbs.toFixed(1)}g
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          F: {item.fat.toFixed(1)}g
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={() => handleAddToLog(item)}
+                      sx={{ mt: 1 }}
+                    >
+                      Add to Log
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))
+          )}
         </Grid>
       </Container>
     </div>
   );
 };
 
-export default FoodDatabase; 
+export default FoodDatabase;

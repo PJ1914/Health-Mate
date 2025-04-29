@@ -9,23 +9,28 @@ const Login = () => {
   const auth = getAuth();
 
   useEffect(() => {
-    // If user is already logged in, redirect to home
+    console.log('Login: Checking auth state');
     const unsubscribe = auth.onAuthStateChanged((user) => {
+      console.log('Login: onAuthStateChanged', { user });
       if (user) {
         navigate('/');
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      console.log('Login: Cleaning up onAuthStateChanged');
+      unsubscribe();
+    };
   }, [auth, navigate]);
 
   const handleGoogleSignIn = async () => {
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
+      console.log('Login: Google Sign-In successful');
       navigate('/');
     } catch (error) {
-      console.error('Error signing in with Google:', error);
+      console.error('Login: Error signing in with Google:', error);
     }
   };
 
@@ -47,4 +52,4 @@ const Login = () => {
   );
 };
 
-export default Login; 
+export default Login;

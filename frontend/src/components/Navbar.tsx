@@ -80,7 +80,9 @@ const Navbar = () => {
                 }}
                 sx={{ mt: 2 }}
               >
-                <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
+                <MenuItem component={RouterLink} to="/Profile" onClick={handleProfileMenuClose}>
+                  Profile
+                </MenuItem>
                 <MenuItem onClick={handleLogout}>Log Out</MenuItem>
               </Menu>
             </Box>

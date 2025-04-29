@@ -1,5 +1,3 @@
-# backend/nutrition/views.py
-
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -15,29 +13,55 @@ collection_name = 'food_entries'  # Firestore collection name
 def food_list(request):
     if request.method == 'GET':
         # Fetch all documents, ordered by timestamp descending
-        docs = db.collection(collection_name).order_by("timestamp", direction=firestore.Query.DESCENDING).stream()
-        entries = []
-        for doc in docs:
-            data = doc.to_dict()
-            data['id'] = doc.id  # add document ID to the data
-            entries.append(data)
-        return Response(entries)
+        try:
+            docs = db.collection(collection_name).order_by(
+                "timestamp", direction=firestore.Query.DESCENDING
+            ).stream()
+            entries = []
+            for doc in docs:
+                data = doc.to_dict()
+                data['id'] = doc.id  # add document ID to the data
+                entries.append(data)
+            return Response(entries)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     elif request.method == 'POST':
         data = request.data
         try:
+            # Validate required fields
+            required_fields = ["food_name", "calories", "protein", "carbs", "fat"]
+            if not all(field in data for field in required_fields):
+                return Response(
+                    {"error": "Missing required fields"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Validate numeric fields
+            for field in ["calories", "protein", "carbs", "fat"]:
+                try:
+                    float(data[field])
+                except (ValueError, TypeError):
+                    return Response(
+                        {"error": f"Invalid value for {field}: must be a number"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
             new_id = str(uuid.uuid4())
             db.collection(collection_name).document(new_id).set({
-                "food_name": data.get("food_name"),
-                "calories": float(data.get("calories")),
-                "protein": float(data.get("protein")),
-                "carbs": float(data.get("carbs")),
-                "fat": float(data.get("fat")),
+                "food_name": data["food_name"],
+                "calories": float(data["calories"]),
+                "protein": float(data["protein"]),
+                "carbs": float(data["carbs"]),
+                "fat": float(data["fat"]),
                 "timestamp": datetime.utcnow()
             })
             return Response({"id": new_id, **data}, status=status.HTTP_201_CREATED)
-        except Exception as e:
+        except (ValueError, TypeError) as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": f"Failed to create entry: {str(e)}"}, 
+                           status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['DELETE'])
@@ -48,7 +72,8 @@ def food_delete(request, pk):
             doc_ref.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
-            return Response({"error": "Document not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Document not found"}, 
+                           status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -57,13 +82,21 @@ def food_delete(request, pk):
 def food_summary(request):
     try:
         docs = db.collection(collection_name).stream()
-        total = {"total_calories": 0, "total_protein": 0, "total_carbs": 0, "total_fat": 0}
+        total = {
+            "total_calories": 0.0,
+            "total_protein": 0.0,
+            "total_carbs": 0.0,
+            "total_fat": 0.0
+        }
         for doc in docs:
             data = doc.to_dict()
-            total["total_calories"] += float(data.get("calories", 0))
-            total["total_protein"] += float(data.get("protein", 0))
-            total["total_carbs"] += float(data.get("carbs", 0))
-            total["total_fat"] += float(data.get("fat", 0))
+            for key in ["calories", "protein", "carbs", "fat"]:
+                try:
+                    total[f"total_{key}"] += float(data.get(key, 0))
+                except (ValueError, TypeError):
+                    # Skip invalid data
+                    continue
         return Response(total)
     except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({"error": f"Failed to compute summary: {str(e)}"}, 
+                       status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -1,28 +1,30 @@
 .trackingContainer {
   min-height: calc(100vh - 64px);
-  background: linear-gradient(135deg, var(--background-light) 0%, var(--background-dark) 100%);
-  padding: 2rem 0;
+  background: #f9fafb;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .title {
-  color: var(--text-primary);
+  color: #1f2937;
   text-align: center;
   margin-bottom: 2rem;
   font-weight: 600;
+  font-size: 2.25rem;
+  line-height: 1.2;
 }
 
 .summaryCard,
 .statsCard,
 .foodLog {
-  background: rgba(255, 255, 255, 0.95) !important;
-  border-radius: 16px !important;
-  box-shadow: var(--shadow-md) !important;
-  transition: transform 0.2s ease-in-out;
-}
-
-.summaryCard:hover,
-.statsCard:hover {
-  transform: translateY(-4px);
+  background: #ffffff !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .foodLog {
@@ -30,16 +32,16 @@
 }
 
 .foodEntry {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  transition: background-color 0.2s ease;
+  border-bottom: 1px solid #f3f4f6;
   padding: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  transition: background-color 0.2s ease;
 }
 
 .foodEntry:hover {
-  background-color: rgba(0, 0, 0, 0.02);
+  background-color: #f9fafb;
 }
 
 .foodEntry:last-child {
@@ -49,61 +51,251 @@
 .progressBar {
   height: 8px !important;
   border-radius: 4px !important;
-}
-
-.progressBar:global(.MuiLinearProgress-colorPrimary) {
-  background-color: rgba(76, 175, 80, 0.2);
-}
-
-.progressBar:global(.MuiLinearProgress-barColorPrimary) {
-  background-color: var(--primary-color);
+  background-color: #e5e7eb !important;
 }
 
 .progressBarCalories {
-  background-color: rgba(255, 87, 34, 0.2); /* Orange for Calories */
+  height: 8px !important;
+  border-radius: 4px !important;
+}
+.progressBarCalories:global(.MuiLinearProgress-bar) {
+  background-color: #f97316 !important;
 }
 
 .progressBarProtein {
-  background-color: rgba(33, 150, 243, 0.2); /* Blue for Protein */
+  height: 8px !important;
+  border-radius: 4px !important;
+}
+.progressBarProtein:global(.MuiLinearProgress-bar) {
+  background-color: #3b82f6 !important;
 }
 
 .progressBarCarbs {
-  background-color: rgba(255, 235, 59, 0.2); /* Yellow for Carbs */
+  height: 8px !important;
+  border-radius: 4px !important;
+}
+.progressBarCarbs:global(.MuiLinearProgress-bar) {
+  background-color: #eab308 !important;
 }
 
 .progressBarFat {
-  background-color: rgba(233, 30, 99, 0.2); /* Pink for Fat */
+  height: 8px !important;
+  border-radius: 4px !important;
+}
+.progressBarFat:global(.MuiLinearProgress-bar) {
+  background-color: #ec4899 !important;
+}
+
+.chartContainer {
+  position: relative;
+  max-height: 350px;
+  width: 100%;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  overflow: hidden;
 }
 
 .macroDistribution {
-  height: 200px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  max-height: 250px;
+  width: 100%;
+  padding: 1.5rem;
 }
 
+/* Extra Small Devices (Phones, <600px) */
 @media (max-width: 600px) {
   .trackingContainer {
     padding: 1rem;
+    min-height: calc(100vh - 56px);
   }
 
   .title {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
   }
 
   .summaryCard,
   .statsCard,
   .foodLog {
     padding: 1rem !important;
+    border-radius: 8px !important;
+    margin-bottom: 1rem;
+  }
+
+  .foodLog {
+    margin-top: 1rem;
   }
 
   .foodEntry {
     flex-direction: column;
     align-items: flex-start;
-    text-align: left;
+    padding: 0.75rem;
   }
 
-  .foodEntry:hover {
-    background-color: rgba(0, 0, 0, 0.05); /* Slightly more prominent hover on mobile */
+  .foodEntry > div {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .foodEntry button {
+    align-self: flex-end;
+  }
+
+  .progressBar,
+  .progressBarCalories,
+  .progressBarProtein,
+  .progressBarCarbs,
+  .progressBarFat {
+    height: 6px !important;
+  }
+
+  .chartContainer {
+    max-height: 250px;
+    padding: 0.75rem;
+  }
+
+  .macroDistribution {
+    max-height: 180px;
+    padding: 0.75rem;
+  }
+}
+
+/* Small Devices (Large Phones, Small Tablets, 600px–900px) */
+@media (min-width: 600px) and (max-width: 900px) {
+  .trackingContainer {
+    padding: 1.5rem;
+  }
+
+  .title {
+    font-size: 1.875rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .summaryCard,
+  .statsCard,
+  .foodLog {
+    padding: 1.25rem !important;
+    border-radius: 10px !important;
+  }
+
+  .foodLog {
+    margin-top: 1.5rem;
+  }
+
+  .foodEntry {
+    padding: 0.875rem;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .progressBar,
+  .progressBarCalories,
+  .progressBarProtein,
+  .progressBarCarbs,
+  .progressBarFat {
+    height: 7px !important;
+  }
+
+  .chartContainer {
+    max-height: 300px;
+    padding: 1rem;
+  }
+
+  .macroDistribution {
+    max-height: 200px;
+    padding: 1rem;
+  }
+}
+
+/* Medium Devices (Tablets, Small Desktops, 900px–1200px) */
+@media (min-width: 900px) and (max-width: 1200px) {
+  .trackingContainer {
+    padding: 1.75rem;
+  }
+
+  .title {
+    font-size: 2rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .summaryCard,
+  .statsCard,
+  .foodLog {
+    padding: 1.5rem !important;
+    border-radius: 10px !important;
+  }
+
+  .foodLog {
+    margin-top: 1.75rem;
+  }
+
+  .foodEntry {
+    padding: 1rem;
+  }
+
+  .progressBar,
+  .progressBarCalories,
+  .progressBarProtein,
+  .progressBarCarbs,
+  .progressBarFat {
+    height: 8px !important;
+  }
+
+  .chartContainer {
+    max-height: 325px;
+    padding: 1.25rem;
+  }
+
+  .macroDistribution {
+    max-height: 225px;
+    padding: 1.25rem;
+  }
+}
+
+/* Large Devices (Desktops, >1200px) */
+@media (min-width: 1200px) {
+  .trackingContainer {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .title {
+    font-size: 2.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .summaryCard,
+  .statsCard,
+  .foodLog {
+    padding: 2rem !important;
+    border-radius: 12px !important;
+  }
+
+  .foodLog {
+    margin-top: 2rem;
+  }
+
+  .foodEntry {
+    padding: 1.25rem;
+  }
+
+  .progressBar,
+  .progressBarCalories,
+  .progressBarProtein,
+  .progressBarCarbs,
+  .progressBarFat {
+    height: 8px !important;
+  }
+
+  .chartContainer {
+    max-height: 350px;
+    padding: 1.5rem;
+  }
+
+  .macroDistribution {
+    max-height: 250px;
+    padding: 1.5rem;
   }
 }

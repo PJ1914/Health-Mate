@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'food_detection.apps.FoodDetectionConfig',
+    'fooddb.apps.FooddbConfig',
     'nutrition',
 ]
 

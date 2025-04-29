@@ -1,0 +1,43 @@
+.profileContainer {
+    background-color: #f5f5f5;
+    min-height: 100vh;
+  }
+  
+  .title {
+    font-weight: 700;
+    color: #1976d2;
+  }
+  
+  .profileSection {
+    padding: 24px;
+    margin-top: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+  }
+  
+  .avatarSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .nutritionSection {
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+  }
+  
+  @media (max-width: 600px) {
+    .profileSection {
+      padding: 16px;
+    }
+  
+    .nutritionSection {
+      padding: 16px;
+    }
+  
+    .avatarSection {
+      margin-bottom: 16px;
+    }
+  }
