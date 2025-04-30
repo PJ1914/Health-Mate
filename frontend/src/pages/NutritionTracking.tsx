@@ -295,7 +295,7 @@ const NutritionTracking = () => {
           padding: 15,
           usePointStyle: true,
         },
-        onClick: (event, legendItem, context) => {
+        onClick: (_, legendItem, context) => {
           const chart = context.chart;
           const index = legendItem.datasetIndex;
           if (chart && index !== undefined) { // Ensure chart and index are defined
@@ -351,7 +351,7 @@ const NutritionTracking = () => {
       duration: 800,
       easing: 'easeOutCubic',
     },
-    onClick: (event, elements) => {
+    onClick: (_, elements) => {
       if (elements && elements.length > 0) {
         const index = elements[0].index;
         if (index !== undefined) { // Ensure index is defined
