@@ -85,9 +85,9 @@ const NutritionTracking = () => {
         return;
       }
       try {
-        console.log('NutritionTracking: Fetching entries for user', user.id);
+        console.debug('NutritionTracking: Fetching entries for user', user.uid);
         const response = await axios.get(NUTRITION_API_URL, {
-          params: { userId: user.id },
+          params: { userId: user.uid },
         });
         const entries = response.data.map((entry: any) => ({
           id: entry.id,
@@ -100,7 +100,7 @@ const NutritionTracking = () => {
         }));
         setFoodEntries(entries);
         setError('');
-        console.log('NutritionTracking: Entries fetched', entries);
+        console.debug('NutritionTracking: Entries fetched', entries);
       } catch (err) {
         console.error('NutritionTracking: Error fetching entries', err);
         setError('Failed to fetch food entries');
@@ -136,13 +136,13 @@ const NutritionTracking = () => {
       return;
     }
     try {
-      console.log('NutritionTracking: Deleting entry', id);
+      console.debug('NutritionTracking: Deleting entry', id);
       await axios.delete(`${NUTRITION_API_URL}${id}/`, {
-        params: { userId: user.id },
+        params: { userId: user.uid },
       });
       setFoodEntries((entries) => entries.filter((entry) => entry.id !== id));
       setError('');
-      console.log('NutritionTracking: Entry deleted', id);
+      console.debug('NutritionTracking: Entry deleted', id);
     } catch (err) {
       console.error('NutritionTracking: Error deleting entry', err);
       setError('Failed to delete entry');
@@ -180,9 +180,9 @@ const NutritionTracking = () => {
         carbs: parseFloat(carbs),
         fat: parseFloat(fat),
         timestamp: new Date().toISOString(),
-        userId: user.id,
+        userId: user.uid,
       };
-      console.log('NutritionTracking: Adding entry', newEntry);
+      console.debug('NutritionTracking: Adding entry', newEntry);
       const response = await axios.post(NUTRITION_API_URL, newEntry);
       setFoodEntries((prevEntries) => [
         ...prevEntries,
@@ -190,7 +190,7 @@ const NutritionTracking = () => {
       ]);
       setNewFood({ food_name: '', calories: '', protein: '', carbs: '', fat: '' });
       setError('');
-      console.log('NutritionTracking: Entry added', response.data);
+      console.debug('NutritionTracking: Entry added', response.data);
     } catch (err) {
       console.error('NutritionTracking: Error adding entry', err);
       setError('Failed to add food entry');
@@ -282,7 +282,7 @@ const NutritionTracking = () => {
     ],
   };
 
-  // Chart options with corrected types and fixes
+  // Chart options
   const chartOptions: import('chart.js').ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
@@ -298,9 +298,9 @@ const NutritionTracking = () => {
         onClick: (_, legendItem, context) => {
           const chart = context.chart;
           const index = legendItem.datasetIndex;
-          if (chart && index !== undefined) { // Ensure chart and index are defined
+          if (chart && index !== undefined) {
             const meta = chart.getDatasetMeta(index);
-            meta.hidden = !meta.hidden; // Toggle visibility
+            meta.hidden = !meta.hidden;
             chart.update();
           }
         },
@@ -354,7 +354,7 @@ const NutritionTracking = () => {
     onClick: (_, elements) => {
       if (elements && elements.length > 0) {
         const index = elements[0].index;
-        if (index !== undefined) { // Ensure index is defined
+        if (index !== undefined) {
           setSelectedEntry(filteredEntries[index]);
         }
       }
