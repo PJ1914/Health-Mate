@@ -282,23 +282,25 @@ const NutritionTracking = () => {
     ],
   };
 
-  const chartOptions = {
+  // Chart options with corrected types
+  const chartOptions: import('chart.js').ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'top' as const,
+        position: 'top',
         labels: {
           color: '#1f2937',
           font: { size: 12, weight: '500' },
           padding: 15,
           usePointStyle: true,
         },
-        onClick: (_: any, legendItem: any, legend: any) => {
+        onClick: (e, legendItem, legend) => {
           const index = legendItem.datasetIndex;
-          const ci = legend.chart;
-          ci.getDatasetMeta(index).hidden = !ci.getDatasetMeta(index).hidden;
-          ci.update();
+          const chart = legend.chart;
+          const meta = chart.getDatasetMeta(index);
+          meta.hidden = meta.hidden === null ? !chart.data.datasets[index].hidden : null;
+          chart.update();
         },
       },
       title: {
@@ -318,8 +320,9 @@ const NutritionTracking = () => {
         cornerRadius: 6,
         padding: 10,
         callbacks: {
-          label: (context: any) => {
-            const entry = filteredEntries[context.dataIndex];
+          label: (context) => {
+            const index = context.dataIndex;
+            const entry = filteredEntries[index];
             return [
               `Food: ${entry.food_name}`,
               `Calories: ${entry.calories} kcal`,
@@ -344,16 +347,16 @@ const NutritionTracking = () => {
     },
     animation: {
       duration: 800,
-      easing: 'easeOutCubic' as const,
+      easing: 'easeOutCubic',
     },
-    onClick: (_: any, elements: any) => {
+    onClick: (event, elements, chart) => {
       if (elements.length > 0) {
         const index = elements[0].index;
         setSelectedEntry(filteredEntries[index]);
       }
     },
     interaction: {
-      mode: 'index' as const,
+      mode: 'index',
       intersect: false,
     },
   };
