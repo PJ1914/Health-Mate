@@ -17,7 +17,7 @@ import {
   Skeleton,
 } from '@mui/material';
 import axios from 'axios';
-import { getAuth, updateProfile, User } from 'firebase/auth';
+import { getAuth, updateProfile } from 'firebase/auth';
 import Chart from 'chart.js/auto';
 import { useAuth } from '../contexts/AuthContext';
 import styles from './UserProfile.module.css';
