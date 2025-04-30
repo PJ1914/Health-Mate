@@ -33,10 +33,7 @@ const Navbar = () => {
     setAnchorEl(null); // Close the menu
   };
 
-  const handleProfileClick = () => {
-    navigate('/profile'); // Navigate to the user profile page
-    handleProfileMenuClose();
-  };
+  // Removed handleProfileNavigation function as requested
 
   return (
     <AppBar position="static" sx={{ background: 'linear-gradient(90deg, #6a1b9a, #ab47bc)', boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)' }}>
