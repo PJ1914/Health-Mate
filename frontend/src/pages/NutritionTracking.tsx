@@ -282,7 +282,7 @@ const NutritionTracking = () => {
     ],
   };
 
-  // Chart options with corrected types
+  // Chart options with corrected types and fixes
   const chartOptions: import('chart.js').ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
@@ -295,12 +295,14 @@ const NutritionTracking = () => {
           padding: 15,
           usePointStyle: true,
         },
-        onClick: (e, legendItem, legend) => {
+        onClick: (event, legendItem, context) => {
+          const chart = context.chart;
           const index = legendItem.datasetIndex;
-          const chart = legend.chart;
-          const meta = chart.getDatasetMeta(index);
-          meta.hidden = meta.hidden === null ? !chart.data.datasets[index].hidden : null;
-          chart.update();
+          if (chart && index !== undefined) { // Ensure chart and index are defined
+            const meta = chart.getDatasetMeta(index);
+            meta.hidden = !meta.hidden; // Toggle visibility
+            chart.update();
+          }
         },
       },
       title: {
@@ -349,10 +351,12 @@ const NutritionTracking = () => {
       duration: 800,
       easing: 'easeOutCubic',
     },
-    onClick: (event, elements, chart) => {
-      if (elements.length > 0) {
+    onClick: (event, elements) => {
+      if (elements && elements.length > 0) {
         const index = elements[0].index;
-        setSelectedEntry(filteredEntries[index]);
+        if (index !== undefined) { // Ensure index is defined
+          setSelectedEntry(filteredEntries[index]);
+        }
       }
     },
     interaction: {
