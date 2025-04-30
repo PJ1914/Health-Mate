@@ -17,7 +17,7 @@ import {
   Skeleton,
 } from '@mui/material';
 import axios from 'axios';
-import { getAuth, updateProfile } from 'firebase/auth';
+import { getAuth, updateProfile, User } from 'firebase/auth';
 import Chart from 'chart.js/auto';
 import { useAuth } from '../contexts/AuthContext';
 import styles from './UserProfile.module.css';
@@ -65,7 +65,7 @@ const UserProfile = () => {
   useEffect(() => {
     console.log('UserProfile: useEffect triggered', { user, authLoading });
     if (user && !authLoading) {
-      console.log('UserProfile: Fetching nutrition entries for user', user?.uid);
+      console.log('UserProfile: Fetching nutrition entries for user', user.uid);
       fetchNutritionEntries();
       setDisplayName(user.displayName || '');
       setPhotoURL(user.photoURL || '');
@@ -83,9 +83,9 @@ const UserProfile = () => {
     if (!user) return;
     setLoadingData(true);
     try {
-      console.log('UserProfile: Sending API request to', NUTRITION_API_URL, 'with userId:', user?.uid);
+      console.log('UserProfile: Sending API request to', NUTRITION_API_URL, 'with userId:', user.uid);
       const response = await axios.get(NUTRITION_API_URL, {
-        params: { userId: user?.uid },
+        params: { userId: user.uid },
       });
       const entries = response.data.slice(0, 5);
       setNutritionEntries(entries);
@@ -291,7 +291,7 @@ const UserProfile = () => {
                   <strong>Email:</strong> {user.email || 'No email'}
                 </Typography>
                 <Typography variant="body1">
-                  <strong>User ID:</strong> {user?.uid || 'N/A'}
+                  <strong>User ID:</strong> {user.uid}
                 </Typography>
               </Box>
             </Grid>
