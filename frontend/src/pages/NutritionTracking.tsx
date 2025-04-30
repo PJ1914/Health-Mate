@@ -294,7 +294,7 @@ const NutritionTracking = () => {
           padding: 15,
           usePointStyle: true,
         },
-        onClick: (e: any, legendItem: any, legend: any) => {
+        onClick: (_: any, legendItem: any, legend: any) => {
           const index = legendItem.datasetIndex;
           const ci = legend.chart;
           ci.getDatasetMeta(index).hidden = !ci.getDatasetMeta(index).hidden;
@@ -344,9 +344,9 @@ const NutritionTracking = () => {
     },
     animation: {
       duration: 800,
-      easing: 'easeOutCubic',
+      easing: 'easeOutCubic' as const,
     },
-    onClick: (event: any, elements: any, chart: any) => {
+    onClick: (_: any, elements: any) => {
       if (elements.length > 0) {
         const index = elements[0].index;
         setSelectedEntry(filteredEntries[index]);
@@ -455,7 +455,7 @@ const NutritionTracking = () => {
           <Grid item xs={12}>
             <Paper className={styles.foodLog}>
               <Box p={3}>
-                <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)} sx={{ mb: 2 }}>
+                <Tabs value={tabValue} onChange={(_, newValue) => setTabValue(newValue)} sx={{ mb: 2 }}>
                   <Tab label="Today’s Food Log" />
                   <Tab label="History" />
                 </Tabs>
